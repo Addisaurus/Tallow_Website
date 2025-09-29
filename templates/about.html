@@ -1,0 +1,201 @@
+{#
+    ABOUT PAGE TEMPLATE
+    Tells the story behind the product and the benefits of tallow
+#}
+
+{% extends "base.html" %}
+
+{% block title %}About Us - {{ site_name }}{% endblock %}
+
+{% block description %}Learn about our journey creating natural beef tallow skincare and why we believe in the power of traditional ingredients.{% endblock %}
+
+{% block content %}
+
+{# PAGE HEADER #}
+<section class="py-16 md:py-20 bg-gradient-to-br from-accent to-secondary">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            Our Story
+        </h1>
+        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+            A journey back to nature's wisdom
+        </p>
+    </div>
+</section>
+
+{# THE STORY SECTION #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+            {# Image #}
+            <div>
+                <img src="{{ url_for('static', filename='images/placeholder-story.jpg') }}"
+                     alt="Our Story"
+                     class="rounded-lg shadow-xl w-full">
+            </div>
+
+            {# Story text #}
+            <div>
+                <h2 class="text-3xl font-bold text-dark mb-6" style="font-family: 'Playfair Display', serif;">
+                    It Started With A Search For Better
+                </h2>
+                <div class="space-y-4 text-gray-700 leading-relaxed">
+                    <p>
+                        Like many people, I struggled to find a moisturizer that truly worked for my skin.
+                        Everything I tried was either too greasy, filled with ingredients I couldn't pronounce,
+                        or simply didn't deliver the hydration my skin needed.
+                    </p>
+                    <p>
+                        That's when I discovered the ancient secret of beef tallow. For thousands of years,
+                        our ancestors used animal fats to protect and nourish their skin. It made perfect sense—
+                        tallow is remarkably similar to our skin's natural oils, packed with the exact vitamins
+                        and nutrients our skin craves.
+                    </p>
+                    <p>
+                        After months of research and experimentation, I perfected a formula that's simple,
+                        effective, and completely natural. What started as a personal solution became a passion
+                        to share this incredible product with others seeking healthier, more natural skincare.
+                    </p>
+                    <p class="font-semibold text-primary">
+                        Now, I'm thrilled to bring this time-tested remedy to you, handcrafted with love
+                        and only the finest grass-fed ingredients.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# WHY TALLOW SECTION #}
+<section class="py-16 md:py-24 bg-accent">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            The Science Behind Tallow
+        </h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Why beef tallow is nature's perfect moisturizer
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            {# Science point 1 #}
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="text-primary text-3xl mb-4">
+                    <i class="fas fa-dna"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Bio-Compatible</h3>
+                <p class="text-gray-600">
+                    Tallow's fatty acid profile closely mimics human sebum, making it highly compatible
+                    with our skin's natural biology.
+                </p>
+            </div>
+
+            {# Science point 2 #}
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="text-primary text-3xl mb-4">
+                    <i class="fas fa-capsules"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Vitamin-Rich</h3>
+                <p class="text-gray-600">
+                    Naturally contains vitamins A, D, E, and K2—essential nutrients for healthy,
+                    glowing skin.
+                </p>
+            </div>
+
+            {# Science point 3 #}
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="text-primary text-3xl mb-4">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Anti-Inflammatory</h3>
+                <p class="text-gray-600">
+                    Contains conjugated linoleic acid (CLA) which has natural anti-inflammatory
+                    properties.
+                </p>
+            </div>
+
+            {# Science point 4 #}
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <div class="text-primary text-3xl mb-4">
+                    <i class="fas fa-water"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Non-Comedogenic</h3>
+                <p class="text-gray-600">
+                    Won't clog pores thanks to its compatibility with your skin's natural oils.
+                    Perfect for all skin types.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# OUR VALUES SECTION #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-dark mb-12" style="font-family: 'Playfair Display', serif;">
+            Our Commitment
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
+            {# Value 1 #}
+            <div class="text-center">
+                <div class="bg-accent w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-cow text-3xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Grass-Fed Only</h3>
+                <p class="text-gray-600">
+                    We source only 100% grass-fed beef tallow from ethical, sustainable farms.
+                    Better for the animals, better for the planet, better for your skin.
+                </p>
+            </div>
+
+            {# Value 2 #}
+            <div class="text-center">
+                <div class="bg-accent w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-hands-helping text-3xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Handcrafted Care</h3>
+                <p class="text-gray-600">
+                    Every jar is made by hand in small batches to ensure the highest quality.
+                    We never rush the process or cut corners.
+                </p>
+            </div>
+
+            {# Value 3 #}
+            <div class="text-center">
+                <div class="bg-accent w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-leaf text-3xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Pure Ingredients</h3>
+                <p class="text-gray-600">
+                    No synthetic fragrances, parabens, or preservatives. Just pure, natural ingredients
+                    that you can feel good about putting on your skin.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# CALL TO ACTION #}
+<section class="py-16 md:py-24 bg-primary text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Playfair Display', serif;">
+            Ready to Experience the Difference?
+        </h2>
+        <p class="text-lg mb-8 max-w-2xl mx-auto opacity-90">
+            Join our community of satisfied customers who have discovered the power of natural skincare.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('product') }}" class="btn-white">
+                View Our Product
+            </a>
+            <a href="{{ url_for('contact') }}" class="btn-outline-white">
+                Get In Touch
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

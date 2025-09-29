@@ -1,0 +1,264 @@
+{#
+    CONTACT PAGE TEMPLATE
+    Contact form for customers to reach out with questions
+#}
+
+{% extends "base.html" %}
+
+{% block title %}Contact Us - {{ site_name }}{% endblock %}
+
+{% block description %}Get in touch with us. We'd love to hear from you and answer any questions about our beef tallow moisturizer.{% endblock %}
+
+{% block content %}
+
+{# PAGE HEADER #}
+<section class="py-16 md:py-20 bg-gradient-to-br from-accent to-secondary">
+    <div class="container mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            Get In Touch
+        </h1>
+        <p class="text-lg text-gray-700 max-w-2xl mx-auto">
+            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+        </p>
+    </div>
+</section>
+
+{# CONTACT FORM AND INFO SECTION #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+            {# LEFT COLUMN - Contact Information #}
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold text-dark mb-6">Contact Information</h2>
+
+                {# Email #}
+                <div class="mb-6">
+                    <div class="flex items-start">
+                        <div class="bg-accent w-12 h-12 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fas fa-envelope text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-1">Email</h3>
+                            <a href="mailto:hello@tallowandco.com" class="text-primary hover:text-secondary transition-colors">
+                                hello@tallowandco.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {# Phone (placeholder) #}
+                <div class="mb-6">
+                    <div class="flex items-start">
+                        <div class="bg-accent w-12 h-12 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fas fa-phone text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-1">Phone</h3>
+                            <a href="tel:+15551234567" class="text-primary hover:text-secondary transition-colors">
+                                (555) 123-4567
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {# Business Hours #}
+                <div class="mb-8">
+                    <div class="flex items-start">
+                        <div class="bg-accent w-12 h-12 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                            <i class="fas fa-clock text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800 mb-1">Business Hours</h3>
+                            <p class="text-gray-600 text-sm">Monday - Friday: 9am - 5pm EST</p>
+                            <p class="text-gray-600 text-sm">Saturday: 10am - 2pm EST</p>
+                            <p class="text-gray-600 text-sm">Sunday: Closed</p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Social Media #}
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-3">Follow Us</h3>
+                    <div class="flex space-x-3">
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# RIGHT COLUMN - Contact Form #}
+            <div class="lg:col-span-2">
+                <div class="bg-accent p-8 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-dark mb-6">Send Us a Message</h2>
+
+                    {#
+                        Contact form - Currently just displays a success message
+                        Later, you can integrate with email services like SendGrid or use Flask-Mail
+                    #}
+                    <form method="POST" action="{{ url_for('contact') }}" class="space-y-6">
+
+                        {# CSRF protection token (Flask-WTF provides this) #}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}">
+
+                        {# Name field #}
+                        <div>
+                            <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Your Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   required
+                                   class="form-input"
+                                   placeholder="Jane Doe">
+                        </div>
+
+                        {# Email field #}
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Your Email <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email"
+                                   id="email"
+                                   name="email"
+                                   required
+                                   class="form-input"
+                                   placeholder="jane@example.com">
+                        </div>
+
+                        {# Subject field #}
+                        <div>
+                            <label for="subject" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Subject
+                            </label>
+                            <input type="text"
+                                   id="subject"
+                                   name="subject"
+                                   class="form-input"
+                                   placeholder="Product inquiry">
+                        </div>
+
+                        {# Message field #}
+                        <div>
+                            <label for="message" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Message <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="message"
+                                      name="message"
+                                      required
+                                      rows="6"
+                                      class="form-input"
+                                      placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+
+                        {# Submit button #}
+                        <div>
+                            <button type="submit" class="btn-primary w-full text-lg py-3">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Message
+                            </button>
+                        </div>
+
+                        <p class="text-sm text-gray-600 text-center">
+                            We typically respond within 24 hours during business days.
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# FAQ SECTION #}
+<section class="py-16 bg-accent">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            Frequently Asked Questions
+        </h2>
+        <p class="text-center text-gray-600 mb-12">
+            Quick answers to common questions
+        </p>
+
+        <div class="max-w-3xl mx-auto space-y-4">
+
+            {# FAQ Item 1 #}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="font-semibold text-lg text-dark mb-2">
+                    <i class="fas fa-question-circle text-primary mr-2"></i>
+                    What is beef tallow?
+                </h3>
+                <p class="text-gray-600 pl-8">
+                    Beef tallow is rendered fat from cattle. Our tallow comes exclusively from 100% grass-fed beef,
+                    making it rich in vitamins and beneficial fatty acids that are incredibly nourishing for skin.
+                </p>
+            </div>
+
+            {# FAQ Item 2 #}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="font-semibold text-lg text-dark mb-2">
+                    <i class="fas fa-question-circle text-primary mr-2"></i>
+                    Will it clog my pores?
+                </h3>
+                <p class="text-gray-600 pl-8">
+                    No! Beef tallow is non-comedogenic, meaning it won't clog pores. Because its composition is
+                    so similar to our skin's natural oils (sebum), it's easily absorbed and compatible with all skin types.
+                </p>
+            </div>
+
+            {# FAQ Item 3 #}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="font-semibold text-lg text-dark mb-2">
+                    <i class="fas fa-question-circle text-primary mr-2"></i>
+                    Does it have a smell?
+                </h3>
+                <p class="text-gray-600 pl-8">
+                    Our tallow is highly refined and has minimal scent. We add a subtle blend of lavender and
+                    chamomile essential oils for a light, pleasant fragrance. It's not overpowering!
+                </p>
+            </div>
+
+            {# FAQ Item 4 #}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="font-semibold text-lg text-dark mb-2">
+                    <i class="fas fa-question-circle text-primary mr-2"></i>
+                    How long does shipping take?
+                </h3>
+                <p class="text-gray-600 pl-8">
+                    Orders typically ship within 2-3 business days. Standard shipping takes 5-7 business days.
+                    Expedited shipping options are available at checkout.
+                </p>
+            </div>
+
+            {# FAQ Item 5 #}
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h3 class="font-semibold text-lg text-dark mb-2">
+                    <i class="fas fa-question-circle text-primary mr-2"></i>
+                    What's your return policy?
+                </h3>
+                <p class="text-gray-600 pl-8">
+                    We offer a 30-day money-back guarantee. If you're not completely satisfied with your purchase,
+                    contact us for a full refund—no questions asked!
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <p class="text-gray-700">
+                Still have questions? <a href="#" class="text-primary font-semibold hover:text-secondary transition-colors">Contact us directly</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

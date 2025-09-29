@@ -1,0 +1,19 @@
+# Flask Web Framework
+# This is the core framework for building the website
+Flask==3.0.0
+
+# Python dotenv - loads environment variables from .env file
+# Useful for managing configuration settings (development vs production)
+python-dotenv==1.0.0
+
+# Flask-WTF - Form handling and validation (for contact form)
+# Includes CSRF protection for security
+Flask-WTF==1.2.1
+
+# Email validator - validates email addresses in forms
+email-validator==2.1.0
+
+# Future dependencies (uncomment when ready to add these features):
+# Flask-SQLAlchemy==3.1.1    # Database ORM for product management
+# Flask-Migrate==4.0.5       # Database migrations
+# stripe==7.8.0              # Stripe payment processing

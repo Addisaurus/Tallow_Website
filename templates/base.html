@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {# Page title - will be set by child templates #}
+    <title>{% block title %}{{ site_name }} - Natural Beef Tallow Skincare{% endblock %}</title>
+
+    {# Meta tags for SEO (Search Engine Optimization) #}
+    <meta name="description" content="{% block description %}Handcrafted, natural beef tallow moisturizer made from 100% grass-fed beef tallow. Deep hydration for healthy, glowing skin.{% endblock %}">
+
+    {# Tailwind CSS - Modern utility-first CSS framework (loaded from CDN) #}
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {# Tailwind configuration - customize colors to match brand #}
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Custom brand colors - warm, natural palette
+                        primary: '#8B7355',      // Warm brown
+                        secondary: '#D4A574',    // Light tan
+                        accent: '#F5E6D3',       // Cream
+                        dark: '#3E3E3E',         // Dark gray for text
+                    }
+                }
+            }
+        }
+    </script>
+
+    {# Google Fonts - Professional, readable fonts #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    {# Font Awesome icons #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {# Custom CSS #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {# Allow child templates to add additional CSS #}
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen bg-white text-dark">
+
+    {#
+        NAVIGATION BAR
+        - Sticky header that stays at top when scrolling
+        - Responsive: hamburger menu on mobile, full nav on desktop
+    #}
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+
+                {# Logo/Brand Name #}
+                <a href="{{ url_for('index') }}" class="text-2xl font-bold text-primary" style="font-family: 'Playfair Display', serif;">
+                    {{ site_name }}
+                </a>
+
+                {# Desktop Navigation Links (hidden on mobile) #}
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                        Home
+                    </a>
+                    <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">
+                        About
+                    </a>
+                    <a href="{{ url_for('product') }}" class="nav-link {% if request.endpoint == 'product' %}active{% endif %}">
+                        Product
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
+                        Contact
+                    </a>
+                </div>
+
+                {# Shopping cart icon (placeholder for future functionality) #}
+                <div class="hidden md:flex items-center">
+                    <a href="#" class="text-primary hover:text-secondary transition-colors">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="ml-1 text-sm">(0)</span>
+                    </a>
+                </div>
+
+                {# Mobile menu button (hamburger icon) #}
+                <button id="mobile-menu-button" class="md:hidden text-primary focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+
+            {# Mobile Navigation Menu (hidden by default, shown when hamburger is clicked) #}
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <a href="{{ url_for('index') }}" class="mobile-nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                    Home
+                </a>
+                <a href="{{ url_for('about') }}" class="mobile-nav-link {% if request.endpoint == 'about' %}active{% endif %}">
+                    About
+                </a>
+                <a href="{{ url_for('product') }}" class="mobile-nav-link {% if request.endpoint == 'product' %}active{% endif %}">
+                    Product
+                </a>
+                <a href="{{ url_for('contact') }}" class="mobile-nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
+                    Contact
+                </a>
+                <a href="#" class="mobile-nav-link">
+                    <i class="fas fa-shopping-cart"></i> Cart (0)
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    {#
+        FLASH MESSAGES
+        Used to display one-time messages (e.g., "Form submitted successfully!")
+        Different styles for success, error, info messages
+    #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }} p-4 rounded-lg mb-4 flex items-center justify-between">
+                        <div>
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle mr-2"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle mr-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="text-lg font-bold ml-4">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {#
+        MAIN CONTENT
+        This is where child templates insert their content
+        The 'flex-grow' class makes this section expand to push footer to bottom
+    #}
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    {#
+        FOOTER
+        Company info, social links, copyright
+    #}
+    <footer class="bg-dark text-white mt-16">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+                {# About section #}
+                <div>
+                    <h3 class="text-xl font-bold mb-4" style="font-family: 'Playfair Display', serif;">
+                        {{ site_name }}
+                    </h3>
+                    <p class="text-gray-300 text-sm">
+                        Handcrafted, natural skincare made with love and the finest grass-fed beef tallow.
+                        Nourish your skin the way nature intended.
+                    </p>
+                </div>
+
+                {# Quick links #}
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ url_for('index') }}" class="text-gray-300 hover:text-secondary transition-colors">Home</a></li>
+                        <li><a href="{{ url_for('about') }}" class="text-gray-300 hover:text-secondary transition-colors">About</a></li>
+                        <li><a href="{{ url_for('product') }}" class="text-gray-300 hover:text-secondary transition-colors">Product</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-gray-300 hover:text-secondary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                {# Customer service #}
+                <div>
+                    <h4 class="font-semibold mb-4">Customer Service</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-gray-300 hover:text-secondary transition-colors">Shipping Info</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-secondary transition-colors">Returns</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-secondary transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-secondary transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+
+                {# Social media #}
+                <div>
+                    <h4 class="font-semibold mb-4">Connect With Us</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-2xl text-gray-300 hover:text-secondary transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-2xl text-gray-300 hover:text-secondary transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-2xl text-gray-300 hover:text-secondary transition-colors">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-300 text-sm mt-4">
+                        Follow us for skincare tips and special offers!
+                    </p>
+                </div>
+            </div>
+
+            {# Copyright #}
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; {{ current_year }} {{ site_name }}. All rights reserved. Made with <i class="fas fa-heart text-red-500"></i> and grass-fed tallow.</p>
+            </div>
+        </div>
+    </footer>
+
+    {# Custom JavaScript #}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {# Allow child templates to add additional JavaScript #}
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,345 @@
+{#
+    PRODUCT DETAIL PAGE TEMPLATE
+    Shows detailed product information, ingredients, usage, and purchase option
+#}
+
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - {{ site_name }}{% endblock %}
+
+{% block description %}{{ product.description }}{% endblock %}
+
+{% block content %}
+
+{# PRODUCT DETAIL SECTION #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+            {# LEFT COLUMN - Product Images #}
+            <div>
+                {# Main product image #}
+                <div class="mb-4">
+                    <img src="{{ url_for('static', filename='images/placeholder-product-detail.jpg') }}"
+                         alt="{{ product.name }}"
+                         class="w-full rounded-lg shadow-xl">
+                </div>
+
+                {# Thumbnail images (placeholder for future gallery) #}
+                <div class="grid grid-cols-4 gap-2">
+                    <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                         alt="Product view 1"
+                         class="rounded cursor-pointer hover:opacity-75 transition-opacity border-2 border-primary">
+                    <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                         alt="Product view 2"
+                         class="rounded cursor-pointer hover:opacity-75 transition-opacity">
+                    <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                         alt="Product view 3"
+                         class="rounded cursor-pointer hover:opacity-75 transition-opacity">
+                    <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                         alt="Product view 4"
+                         class="rounded cursor-pointer hover:opacity-75 transition-opacity">
+                </div>
+            </div>
+
+            {# RIGHT COLUMN - Product Information #}
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+                    {{ product.name }}
+                </h1>
+
+                {# Star rating (placeholder) #}
+                <div class="flex items-center mb-6">
+                    <div class="flex text-yellow-400 mr-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="text-gray-600">(128 reviews)</span>
+                </div>
+
+                {# Price #}
+                <div class="mb-6">
+                    <span class="text-4xl font-bold text-primary">${{ "%.2f"|format(product.price) }}</span>
+                    <span class="text-gray-600 ml-2">({{ product.size }})</span>
+                </div>
+
+                {# Product description #}
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    {{ product.description }}
+                </p>
+
+                {# Quantity selector and Add to Cart button #}
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Quantity</label>
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="flex items-center border-2 border-gray-300 rounded-lg">
+                            <button class="px-4 py-2 text-gray-600 hover:text-primary transition-colors">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" value="1" min="1" max="10"
+                                   class="w-16 text-center border-0 focus:outline-none">
+                            <button class="px-4 py-2 text-gray-600 hover:text-primary transition-colors">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {# Add to Cart Button (placeholder - will integrate with Stripe later) #}
+                    <button class="btn-primary w-full text-lg py-4 mb-3">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        Add to Cart
+                    </button>
+
+                    {# Buy Now Button (placeholder) #}
+                    <button class="btn-secondary w-full text-lg py-4">
+                        <i class="fas fa-bolt mr-2"></i>
+                        Buy Now
+                    </button>
+                </div>
+
+                {# Product highlights #}
+                <div class="border-t border-gray-200 pt-6">
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Free shipping on orders over $50</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">30-day money-back guarantee</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Handcrafted in small batches</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Ships within 2-3 business days</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# INGREDIENTS & BENEFITS TABS SECTION #}
+<section class="py-16 bg-accent">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+
+            {# Tab navigation #}
+            <div class="flex border-b-2 border-gray-300 mb-8">
+                <button class="tab-button active" data-tab="ingredients">
+                    Ingredients
+                </button>
+                <button class="tab-button" data-tab="benefits">
+                    Benefits
+                </button>
+                <button class="tab-button" data-tab="usage">
+                    How to Use
+                </button>
+            </div>
+
+            {# Tab content #}
+            <div class="tab-content" id="ingredients">
+                <h3 class="text-2xl font-bold text-dark mb-4">Pure, Natural Ingredients</h3>
+                <p class="text-gray-700 mb-6">
+                    We believe in transparency. Here's exactly what's in every jar:
+                </p>
+                <ul class="space-y-3">
+                    {% for ingredient in product.ingredients %}
+                    <li class="flex items-start bg-white p-4 rounded-lg shadow-sm">
+                        <i class="fas fa-leaf text-primary mt-1 mr-3"></i>
+                        <div>
+                            <span class="font-semibold">{{ ingredient }}</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="mt-6 p-4 bg-white rounded-lg border-l-4 border-primary">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-info-circle text-primary mr-2"></i>
+                        <strong>Note:</strong> All our tallow is sourced from 100% grass-fed cattle.
+                        No hormones, no antibiotics, no GMOs.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="benefits">
+                <h3 class="text-2xl font-bold text-dark mb-4">Experience These Benefits</h3>
+                <p class="text-gray-700 mb-6">
+                    Beef tallow moisturizer offers unique advantages over conventional skincare products:
+                </p>
+                <div class="space-y-4">
+                    {% for benefit in product.benefits %}
+                    <div class="flex items-start bg-white p-4 rounded-lg shadow-sm">
+                        <i class="fas fa-heart text-primary mt-1 mr-3"></i>
+                        <span class="text-gray-700">{{ benefit }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tab-content hidden" id="usage">
+                <h3 class="text-2xl font-bold text-dark mb-4">How to Use</h3>
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                                1
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Cleanse Your Skin</h4>
+                                <p class="text-gray-700">
+                                    Start with clean, slightly damp skin for best absorption.
+                                    Pat dry gently with a towel.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                                2
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Apply a Small Amount</h4>
+                                <p class="text-gray-700">
+                                    Take a pea-sized amount and warm it between your fingers.
+                                    A little goes a long way!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                                3
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Massage Gently</h4>
+                                <p class="text-gray-700">
+                                    Massage into your skin using upward, circular motions.
+                                    Focus on dry areas like elbows and knees.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                                4
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2">Let It Absorb</h4>
+                                <p class="text-gray-700">
+                                    Allow 1-2 minutes for full absorption. Use morning and night for best results.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-white rounded-lg border-l-4 border-secondary">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-lightbulb text-secondary mr-2"></i>
+                        <strong>Pro Tip:</strong> Store in a cool, dry place. If the product becomes too firm,
+                        warm a small amount in your hands before applying.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# TESTIMONIALS SECTION #}
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-dark mb-12" style="font-family: 'Playfair Display', serif;">
+            Customer Reviews
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {# Review 1 #}
+            <div class="bg-accent p-6 rounded-lg">
+                <div class="flex items-center mb-3">
+                    <div class="flex text-yellow-400 mr-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-3 italic">
+                    "Absolutely love this product! My skin has never felt better.
+                    I've tried countless moisturizers, but this is the only one that actually works."
+                </p>
+                <p class="font-semibold text-primary">- Emily R.</p>
+                <p class="text-sm text-gray-500">Verified Purchase</p>
+            </div>
+
+            {# Review 2 #}
+            <div class="bg-accent p-6 rounded-lg">
+                <div class="flex items-center mb-3">
+                    <div class="flex text-yellow-400 mr-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-3 italic">
+                    "I was skeptical at first, but wow! The texture is amazing and it absorbs so quickly.
+                    My husband even started using it!"
+                </p>
+                <p class="font-semibold text-primary">- Sarah M.</p>
+                <p class="text-sm text-gray-500">Verified Purchase</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="#" class="text-primary hover:text-secondary transition-colors font-semibold">
+                Read All Reviews <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Hide all tab contents
+                tabContents.forEach(content => content.classList.add('hidden'));
+
+                // Show target tab content
+                document.getElementById(targetTab).classList.remove('hidden');
+            });
+        });
+    });
+</script>
+{% endblock %}

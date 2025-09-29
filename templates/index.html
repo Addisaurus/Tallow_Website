@@ -1,0 +1,230 @@
+{#
+    HOMEPAGE TEMPLATE
+    This template extends base.html and adds homepage-specific content
+#}
+
+{% extends "base.html" %}
+
+{% block title %}{{ site_name }} - Natural Beef Tallow Moisturizer{% endblock %}
+
+{% block description %}Discover the power of nature with our handcrafted beef tallow moisturizer. Deep hydration, natural ingredients, and glowing skin.{% endblock %}
+
+{% block content %}
+
+{# HERO SECTION - Main eye-catching section at the top #}
+<section class="hero-section bg-gradient-to-br from-accent to-secondary py-20 md:py-32">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+            {# Left side - Text content #}
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-dark mb-6" style="font-family: 'Playfair Display', serif;">
+                    Nourish Your Skin<br>
+                    <span class="text-primary">The Natural Way</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
+                    Experience the ancient secret of beef tallow skincare. Our handcrafted moisturizer
+                    deeply hydrates and rejuvenates, using only the finest grass-fed ingredients.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <a href="{{ url_for('product') }}" class="btn-primary">
+                        Shop Now
+                    </a>
+                    <a href="{{ url_for('about') }}" class="btn-secondary">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+
+            {# Right side - Product image #}
+            <div class="flex justify-center">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-primary opacity-20 rounded-full blur-3xl"></div>
+                    <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}"
+                         alt="Beef Tallow Moisturizer"
+                         class="relative rounded-lg shadow-2xl w-full max-w-md">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# BENEFITS SECTION - Why choose our product #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            Why Beef Tallow?
+        </h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Beef tallow is nature's perfect moisturizer, packed with nutrients your skin craves.
+        </p>
+
+        {# Benefits grid #}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+            {# Benefit 1 #}
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-leaf text-4xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">100% Natural</h3>
+                <p class="text-gray-600">
+                    Made from grass-fed beef tallow with no synthetic chemicals, parabens, or artificial fragrances.
+                </p>
+            </div>
+
+            {# Benefit 2 #}
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-heart text-4xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Skin-Compatible</h3>
+                <p class="text-gray-600">
+                    Beef tallow closely mimics our skin's natural oils, making it incredibly compatible and non-comedogenic.
+                </p>
+            </div>
+
+            {# Benefit 3 #}
+            <div class="benefit-card">
+                <div class="benefit-icon">
+                    <i class="fas fa-spa text-4xl text-primary"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Deep Hydration</h3>
+                <p class="text-gray-600">
+                    Rich in vitamins A, D, E, and K for deep, lasting moisture without the greasy feel.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# PRODUCT SHOWCASE SECTION #}
+<section class="py-16 md:py-24 bg-accent">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+            {# Product image #}
+            <div class="order-2 md:order-1 flex justify-center">
+                <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                     alt="Pure Beef Tallow Moisturizer"
+                     class="rounded-lg shadow-xl w-full max-w-md">
+            </div>
+
+            {# Product info #}
+            <div class="order-1 md:order-2">
+                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-6" style="font-family: 'Playfair Display', serif;">
+                    Pure Beef Tallow Moisturizer
+                </h2>
+                <p class="text-gray-700 mb-6 leading-relaxed">
+                    Our signature moisturizer is whipped to perfection, creating a light, luxurious texture
+                    that absorbs quickly while providing deep, lasting hydration.
+                </p>
+
+                {# Features list #}
+                <ul class="space-y-3 mb-8">
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                        <span class="text-gray-700">100% Grass-Fed Beef Tallow</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                        <span class="text-gray-700">Handcrafted in Small Batches</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                        <span class="text-gray-700">Suitable for All Skin Types</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                        <span class="text-gray-700">No Harsh Chemicals or Preservatives</span>
+                    </li>
+                </ul>
+
+                <div class="flex items-center gap-4">
+                    <span class="text-3xl font-bold text-primary">$24.99</span>
+                    <a href="{{ url_for('product') }}" class="btn-primary">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# TESTIMONIALS SECTION (placeholder) #}
+<section class="py-16 md:py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+            What Our Customers Say
+        </h2>
+        <p class="text-center text-gray-600 mb-12">
+            Real results from real people
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {# Testimonial 1 #}
+            <div class="testimonial-card">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 mb-4 italic">
+                    "This moisturizer is incredible! My skin has never felt so soft and hydrated.
+                    I love that it's all natural."
+                </p>
+                <p class="font-semibold text-primary">- Sarah M.</p>
+            </div>
+
+            {# Testimonial 2 #}
+            <div class="testimonial-card">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 mb-4 italic">
+                    "I have sensitive skin and most products irritate it. Not this one!
+                    It's gentle and works beautifully."
+                </p>
+                <p class="font-semibold text-primary">- Jennifer L.</p>
+            </div>
+
+            {# Testimonial 3 #}
+            <div class="testimonial-card">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                </div>
+                <p class="text-gray-700 mb-4 italic">
+                    "Finally, a natural moisturizer that actually works! My dry winter skin is saved."
+                </p>
+                <p class="font-semibold text-primary">- Michael R.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# CALL TO ACTION SECTION #}
+<section class="py-16 md:py-24 bg-primary text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Playfair Display', serif;">
+            Ready to Transform Your Skin?
+        </h2>
+        <p class="text-lg mb-8 max-w-2xl mx-auto">
+            Join hundreds of satisfied customers who have discovered the power of nature's perfect moisturizer.
+        </p>
+        <a href="{{ url_for('product') }}" class="btn-white">
+            Shop Now
+        </a>
+    </div>
+</section>
+
+{% endblock %}
