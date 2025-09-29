@@ -76,11 +76,16 @@
                     </a>
                 </div>
 
-                {# Shopping cart icon (placeholder for future functionality) #}
+                {# Shopping cart icon #}
                 <div class="hidden md:flex items-center">
-                    <a href="#" class="text-primary hover:text-secondary transition-colors">
+                    <a href="{{ url_for('cart') }}" class="text-primary hover:text-secondary transition-colors relative">
                         <i class="fas fa-shopping-cart text-xl"></i>
+                        {% if cart_count > 0 %}
+                        <span class="ml-1 text-sm font-semibold">({{ cart_count }})</span>
+                        <span class="absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ cart_count }}</span>
+                        {% else %}
                         <span class="ml-1 text-sm">(0)</span>
+                        {% endif %}
                     </a>
                 </div>
 
@@ -104,8 +109,8 @@
                 <a href="{{ url_for('contact') }}" class="mobile-nav-link {% if request.endpoint == 'contact' %}active{% endif %}">
                     Contact
                 </a>
-                <a href="#" class="mobile-nav-link">
-                    <i class="fas fa-shopping-cart"></i> Cart (0)
+                <a href="{{ url_for('cart') }}" class="mobile-nav-link {% if request.endpoint == 'cart' %}active{% endif %}">
+                    <i class="fas fa-shopping-cart"></i> Cart ({{ cart_count }})
                 </a>
             </div>
         </div>

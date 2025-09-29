@@ -1,0 +1,232 @@
+{#
+    SHOPPING CART PAGE TEMPLATE
+    Displays items in cart with quantity controls and totals
+#}
+
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+{# SHOPPING CART SECTION #}
+<section class="py-16 md:py-24 bg-accent min-h-screen">
+    <div class="container mx-auto px-4">
+        <h1 class="text-3xl md:text-4xl font-bold text-dark mb-8" style="font-family: 'Playfair Display', serif;">
+            Shopping Cart
+        </h1>
+
+        {% if cart %}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {# LEFT COLUMN - Cart Items #}
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        {# Cart items table header (desktop only) #}
+                        <div class="hidden md:grid md:grid-cols-12 gap-4 p-4 bg-gray-50 border-b font-semibold text-gray-700">
+                            <div class="col-span-6">Product</div>
+                            <div class="col-span-2 text-center">Price</div>
+                            <div class="col-span-2 text-center">Quantity</div>
+                            <div class="col-span-2 text-right">Subtotal</div>
+                        </div>
+
+                        {# Cart items #}
+                        {% for item in cart %}
+                        <div class="border-b last:border-b-0 p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                {# Product info #}
+                                <div class="col-span-1 md:col-span-6">
+                                    <div class="flex items-center space-x-4">
+                                        {# Placeholder product image #}
+                                        <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                                             alt="{{ item.name }}"
+                                             class="w-20 h-20 object-cover rounded">
+                                        <div>
+                                            <h3 class="font-semibold text-gray-900">{{ item.name }}</h3>
+                                            <p class="text-sm text-gray-600">{{ item.size }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {# Price #}
+                                <div class="col-span-1 md:col-span-2 text-left md:text-center">
+                                    <span class="md:hidden font-semibold text-gray-700">Price: </span>
+                                    <span class="text-gray-900">${{ "%.2f"|format(item.price) }}</span>
+                                </div>
+
+                                {# Quantity controls #}
+                                <div class="col-span-1 md:col-span-2">
+                                    <div class="flex items-center justify-start md:justify-center space-x-2">
+                                        <span class="md:hidden font-semibold text-gray-700">Quantity: </span>
+                                        <form action="{{ url_for('update_cart') }}" method="POST" class="flex items-center space-x-2">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="product_name" value="{{ item.name }}">
+                                            <div class="flex items-center border-2 border-gray-300 rounded-lg">
+                                                <button type="button" class="decrease-qty px-3 py-1 text-gray-600 hover:text-primary transition-colors"
+                                                        data-product="{{ item.name }}">
+                                                    <i class="fas fa-minus text-sm"></i>
+                                                </button>
+                                                <input type="number" name="quantity" value="{{ item.quantity }}"
+                                                       min="1" max="10"
+                                                       class="quantity-input w-12 text-center border-0 focus:outline-none"
+                                                       data-product="{{ item.name }}">
+                                                <button type="button" class="increase-qty px-3 py-1 text-gray-600 hover:text-primary transition-colors"
+                                                        data-product="{{ item.name }}">
+                                                    <i class="fas fa-plus text-sm"></i>
+                                                </button>
+                                            </div>
+                                            <button type="submit" class="text-sm text-primary hover:text-secondary font-semibold">
+                                                Update
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                {# Subtotal and Remove #}
+                                <div class="col-span-1 md:col-span-2 text-left md:text-right">
+                                    <div class="flex md:flex-col items-center md:items-end justify-between md:justify-start space-y-0 md:space-y-2">
+                                        <div>
+                                            <span class="md:hidden font-semibold text-gray-700">Subtotal: </span>
+                                            <span class="font-semibold text-gray-900">${{ "%.2f"|format(item.price * item.quantity) }}</span>
+                                        </div>
+                                        <form action="{{ url_for('remove_from_cart') }}" method="POST" class="inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="product_name" value="{{ item.name }}">
+                                            <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-semibold"
+                                                    onclick="return confirm('Remove this item from cart?')">
+                                                <i class="fas fa-trash mr-1"></i> Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {# Continue shopping button #}
+                    <div class="mt-6">
+                        <a href="{{ url_for('product') }}" class="btn-secondary inline-flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                {# RIGHT COLUMN - Order Summary #}
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                        <h2 class="text-2xl font-bold text-dark mb-6" style="font-family: 'Playfair Display', serif;">
+                            Order Summary
+                        </h2>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between text-gray-700">
+                                <span>Subtotal:</span>
+                                <span>${{ "%.2f"|format(totals.subtotal) }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-700">
+                                <span>Tax (8%):</span>
+                                <span>${{ "%.2f"|format(totals.tax) }}</span>
+                            </div>
+                            <div class="flex justify-between text-gray-700">
+                                <span>Shipping:</span>
+                                <span>
+                                    {% if totals.shipping == 0 %}
+                                        <span class="text-green-600 font-semibold">FREE</span>
+                                    {% else %}
+                                        ${{ "%.2f"|format(totals.shipping) }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if totals.subtotal < 50 %}
+                            <p class="text-sm text-gray-600 italic">
+                                <i class="fas fa-info-circle text-primary mr-1"></i>
+                                Add ${{ "%.2f"|format(50 - totals.subtotal) }} more for free shipping!
+                            </p>
+                            {% endif %}
+                            <div class="border-t pt-3 mt-3">
+                                <div class="flex justify-between text-xl font-bold text-dark">
+                                    <span>Total:</span>
+                                    <span>${{ "%.2f"|format(totals.total) }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{{ url_for('checkout') }}" class="btn-primary w-full text-center block text-lg py-4">
+                            Proceed to Checkout
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+
+                        {# Trust badges #}
+                        <div class="mt-6 pt-6 border-t space-y-3">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-shield-alt text-primary mr-2"></i>
+                                <span>Secure checkout</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-truck text-primary mr-2"></i>
+                                <span>Ships within 2-3 business days</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-undo text-primary mr-2"></i>
+                                <span>30-day money-back guarantee</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        {% else %}
+            {# Empty cart message #}
+            <div class="bg-white rounded-lg shadow-md p-12 text-center max-w-2xl mx-auto">
+                <i class="fas fa-shopping-cart text-gray-300 text-6xl mb-4"></i>
+                <h2 class="text-2xl font-bold text-dark mb-4">Your cart is empty</h2>
+                <p class="text-gray-600 mb-6">
+                    Looks like you haven't added any products to your cart yet.
+                </p>
+                <a href="{{ url_for('product') }}" class="btn-primary inline-block">
+                    Start Shopping
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quantity controls for cart items
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all quantity inputs
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const decreaseBtns = document.querySelectorAll('.decrease-qty');
+        const increaseBtns = document.querySelectorAll('.increase-qty');
+
+        // Decrease quantity
+        decreaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productName = this.getAttribute('data-product');
+                const input = document.querySelector(`.quantity-input[data-product="${productName}"]`);
+                let currentQty = parseInt(input.value);
+                if (currentQty > 1) {
+                    input.value = currentQty - 1;
+                }
+            });
+        });
+
+        // Increase quantity
+        increaseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const productName = this.getAttribute('data-product');
+                const input = document.querySelector(`.quantity-input[data-product="${productName}"]`);
+                let currentQty = parseInt(input.value);
+                if (currentQty < 10) {
+                    input.value = currentQty + 1;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

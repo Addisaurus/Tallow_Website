@@ -1,0 +1,230 @@
+{#
+    ORDER CONFIRMATION PAGE TEMPLATE
+    Displays order details after successful checkout
+#}
+
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+{# ORDER CONFIRMATION SECTION #}
+<section class="py-16 md:py-24 bg-accent min-h-screen">
+    <div class="container mx-auto px-4">
+        {# Success message #}
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-8 md:p-12 text-center mb-8">
+                <div class="mb-6">
+                    <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+                    Order Confirmed!
+                </h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    Thank you for your order, <strong>{{ order.customer_name }}</strong>!
+                </p>
+                <div class="bg-accent p-4 rounded-lg inline-block">
+                    <p class="text-sm text-gray-600 mb-1">Order Number</p>
+                    <p class="text-2xl font-bold text-primary">#{{ order.id }}</p>
+                </div>
+            </div>
+
+            {# Payment Notice #}
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-6 mb-8">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-yellow-600 text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-yellow-900 mb-2">Payment Integration Coming Soon</h3>
+                        <p class="text-yellow-800 mb-2">
+                            Your order has been received and saved with <strong>pending</strong> status.
+                        </p>
+                        <p class="text-yellow-800">
+                            We'll send you an email at <strong>{{ order.customer_email }}</strong> with payment instructions shortly.
+                            Once payment is processed, we'll ship your order within 2-3 business days.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {# Order Details #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {# Customer Information #}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                        <i class="fas fa-user text-primary mr-2"></i>
+                        Customer Information
+                    </h2>
+                    <div class="space-y-2 text-gray-700">
+                        <p><strong>Name:</strong> {{ order.customer_name }}</p>
+                        <p><strong>Email:</strong> {{ order.customer_email }}</p>
+                        <p><strong>Phone:</strong> {{ order.customer_phone }}</p>
+                    </div>
+                </div>
+
+                {# Shipping Address #}
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold text-dark mb-4 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                        <i class="fas fa-truck text-primary mr-2"></i>
+                        Shipping Address
+                    </h2>
+                    <div class="text-gray-700">
+                        <p>{{ order.shipping_street }}</p>
+                        <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Order Items #}
+            <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+                <h2 class="text-xl font-bold text-dark mb-6 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                    <i class="fas fa-box text-primary mr-2"></i>
+                    Order Items
+                </h2>
+
+                <div class="space-y-4 mb-6">
+                    {% for item in order.items %}
+                    <div class="flex items-center justify-between pb-4 border-b last:border-b-0">
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ url_for('static', filename='images/placeholder-product.jpg') }}"
+                                 alt="{{ item.product_name }}"
+                                 class="w-16 h-16 object-cover rounded">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">{{ item.product_name }}</h3>
+                                <p class="text-sm text-gray-600">{{ item.product_size }}</p>
+                                <p class="text-sm text-gray-700">
+                                    Qty: {{ item.quantity }} × ${{ "%.2f"|format(item.product_price / 100) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">${{ "%.2f"|format(item.subtotal / 100) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {# Order Totals #}
+                <div class="space-y-3 pt-6 border-t">
+                    <div class="flex justify-between text-gray-700">
+                        <span>Subtotal:</span>
+                        <span>${{ "%.2f"|format(order.subtotal / 100) }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Tax (8%):</span>
+                        <span>${{ "%.2f"|format(order.tax / 100) }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
+                        <span>Shipping:</span>
+                        <span>
+                            {% if order.shipping_cost == 0 %}
+                                <span class="text-green-600 font-semibold">FREE</span>
+                            {% else %}
+                                ${{ "%.2f"|format(order.shipping_cost / 100) }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="border-t pt-3 mt-3">
+                        <div class="flex justify-between text-xl font-bold text-dark">
+                            <span>Total:</span>
+                            <span>${{ "%.2f"|format(order.total / 100) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Order Status #}
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-dark mb-4 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                    <i class="fas fa-info-circle text-primary mr-2"></i>
+                    Order Status
+                </h2>
+                <div class="flex items-center">
+                    <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold
+                                 {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                 {% elif order.status == 'paid' %}bg-blue-100 text-blue-800
+                                 {% elif order.status == 'processing' %}bg-purple-100 text-purple-800
+                                 {% elif order.status == 'shipped' %}bg-green-100 text-green-800
+                                 {% elif order.status == 'delivered' %}bg-green-100 text-green-800
+                                 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        <i class="fas fa-circle text-xs mr-2"></i>
+                        {{ order.status.capitalize() }}
+                    </span>
+                </div>
+                <p class="text-sm text-gray-600 mt-4">
+                    Order placed on {{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                </p>
+            </div>
+
+            {# What's Next #}
+            <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+                <h2 class="text-xl font-bold text-dark mb-6 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                    What Happens Next?
+                </h2>
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            1
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Order Confirmation Email</h4>
+                            <p class="text-gray-700">
+                                You'll receive a confirmation email at <strong>{{ order.customer_email }}</strong> with your order details.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            2
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Payment Instructions</h4>
+                            <p class="text-gray-700">
+                                We'll send you payment instructions shortly. Once payment is confirmed, we'll process your order immediately.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            3
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Handcrafted & Shipped</h4>
+                            <p class="text-gray-700">
+                                Your order will be handcrafted with care and shipped within 2-3 business days.
+                                You'll receive tracking information once it ships.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            4
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Enjoy Your Product!</h4>
+                            <p class="text-gray-700">
+                                Experience the nourishing benefits of our beef tallow moisturizer. We know you'll love it!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Action Buttons #}
+            <div class="text-center space-y-4">
+                <a href="{{ url_for('product') }}" class="btn-primary inline-block">
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    Continue Shopping
+                </a>
+                <p class="text-sm text-gray-600">
+                    Questions? <a href="{{ url_for('contact') }}" class="text-primary hover:text-secondary font-semibold">Contact us</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

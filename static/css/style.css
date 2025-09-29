@@ -216,6 +216,101 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
+   CART & CHECKOUT
+   ============================================ */
+
+/* Cart badge on navigation */
+.cart-badge {
+    @apply absolute -top-2 -right-2 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold;
+}
+
+/* Cart quantity controls */
+.cart-quantity-control {
+    @apply flex items-center border-2 border-gray-300 rounded-lg;
+}
+
+.cart-quantity-control button {
+    @apply px-3 py-1 text-gray-600 hover:text-primary transition-colors;
+}
+
+.cart-quantity-control input {
+    @apply w-12 text-center border-0 focus:outline-none;
+}
+
+/* Empty cart state */
+.empty-cart-icon {
+    @apply text-gray-300 text-6xl mb-4;
+}
+
+/* Order summary card (sticky) */
+.order-summary {
+    @apply bg-white rounded-lg shadow-md p-6;
+    position: sticky;
+    top: 6rem;
+}
+
+/* Checkout form styles */
+.checkout-section {
+    @apply mb-8;
+}
+
+.checkout-section h2 {
+    @apply text-2xl font-bold text-dark mb-6 pb-3 border-b;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Order confirmation success icon */
+.confirmation-icon {
+    @apply text-green-500 text-6xl mb-4;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Order status badges */
+.status-badge {
+    @apply inline-block px-4 py-2 rounded-full text-sm font-semibold;
+}
+
+.status-badge.pending {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-badge.paid {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.status-badge.processing {
+    @apply bg-purple-100 text-purple-800;
+}
+
+.status-badge.shipped {
+    @apply bg-green-100 text-green-800;
+}
+
+.status-badge.delivered {
+    @apply bg-green-100 text-green-800;
+}
+
+/* Trust badges */
+.trust-badge {
+    @apply flex items-center text-sm text-gray-600;
+}
+
+.trust-badge i {
+    @apply text-primary mr-2;
+}
+
+/* ============================================
    UTILITIES
    ============================================ */
 
