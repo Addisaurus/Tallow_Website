@@ -15,6 +15,11 @@ from models import db, Order, OrderItem
 from forms import CheckoutForm
 from flask_migrate import Migrate
 import os
+import stripe
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def create_app(config_name='development'):
@@ -46,6 +51,12 @@ def create_app(config_name='development'):
 
     # Initialize CSRF protection
     csrf = CSRFProtect(app)
+
+    # Initialize Stripe
+    stripe.api_key = app.config['STRIPE_SECRET_KEY']
+
+    # Exempt webhook route from CSRF protection (Stripe webhooks can't include CSRF tokens)
+    csrf.exempt('stripe_webhook')
 
     return app
 
@@ -372,12 +383,13 @@ def checkout():
     Checkout page
 
     GET: Display checkout form with order summary
-    POST: Process order and save to database
+    POST: Process order, create Stripe Checkout Session, and redirect to Stripe
 
     Validates:
     - Cart is not empty
     - Form data is valid
     - Database save successful
+    - Stripe session created successfully
     """
     # Check if cart is empty
     cart = get_cart()
@@ -399,7 +411,7 @@ def checkout():
 
     if form.validate_on_submit():
         try:
-            # Create new order
+            # Create new order with pending status
             order = Order(
                 customer_name=form.customer_name.data,
                 customer_email=form.customer_email.data,
@@ -430,20 +442,245 @@ def checkout():
             db.session.add(order)
             db.session.commit()
 
-            # Clear cart
+            # Create Stripe Checkout Session
+            # Build line items for Stripe
+            line_items = []
+            for item in cart:
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': item['name'],
+                            'description': f"Size: {item['size']}"
+                        },
+                        'unit_amount': int(item['price'] * 100),  # Price in cents
+                    },
+                    'quantity': item['quantity'],
+                })
+
+            # Add tax as a line item
+            if totals['tax'] > 0:
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': 'Tax (8%)',
+                        },
+                        'unit_amount': totals['tax'],
+                    },
+                    'quantity': 1,
+                })
+
+            # Add shipping as a line item
+            if totals['shipping'] > 0:
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': 'Shipping',
+                        },
+                        'unit_amount': totals['shipping'],
+                    },
+                    'quantity': 1,
+                })
+
+            # Create Stripe Checkout Session
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url=url_for('success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=url_for('cancel', _external=True) + f'?order_id={order.id}',
+                customer_email=form.customer_email.data,
+                metadata={
+                    'order_id': order.id
+                },
+                shipping_address_collection={
+                    'allowed_countries': ['US'],
+                }
+            )
+
+            # Clear cart after creating checkout session
             session['cart'] = []
             session.modified = True
 
-            # Redirect to confirmation page
-            flash('Order placed successfully!', 'success')
-            return redirect(url_for('confirmation', order_id=order.id))
+            # Redirect to Stripe Checkout
+            return redirect(checkout_session.url, code=303)
+
+        except stripe.error.StripeError as e:
+            # Handle Stripe-specific errors
+            db.session.rollback()
+            flash('Payment system error. Please try again.', 'error')
+            print(f"Stripe error: {e}")
 
         except Exception as e:
+            # Handle general errors
             db.session.rollback()
             flash('Error processing order. Please try again.', 'error')
-            print(f"Order error: {e}")  # Log error for debugging
+            print(f"Order error: {e}")
 
     return render_template('checkout.html', form=form, cart=cart, totals=totals_display)
+
+
+@app.route('/success')
+def success():
+    """
+    Payment success route
+
+    Called by Stripe after successful payment.
+    Retrieves the session, verifies payment, updates order status.
+    """
+    # Get session_id from query parameters
+    session_id = request.args.get('session_id')
+
+    if not session_id:
+        flash('Invalid payment session.', 'error')
+        return redirect(url_for('product'))
+
+    try:
+        # Retrieve the Stripe Checkout Session
+        checkout_session = stripe.checkout.Session.retrieve(session_id)
+
+        # Verify payment was successful
+        if checkout_session.payment_status != 'paid':
+            flash('Payment was not completed. Please try again.', 'error')
+            return redirect(url_for('product'))
+
+        # Get order ID from session metadata
+        order_id = checkout_session.metadata.get('order_id')
+
+        if not order_id:
+            flash('Order not found.', 'error')
+            return redirect(url_for('product'))
+
+        # Get order from database
+        order = Order.query.get_or_404(order_id)
+
+        # Verify order total matches payment amount (security check)
+        if order.total != checkout_session.amount_total:
+            # Log this discrepancy
+            print(f"WARNING: Order total mismatch. Order {order_id}: DB={order.total}, Stripe={checkout_session.amount_total}")
+            flash('Payment amount mismatch. Please contact support.', 'error')
+            return redirect(url_for('product'))
+
+        # Update order status to paid
+        order.status = 'paid'
+        order.stripe_payment_id = checkout_session.payment_intent
+        db.session.commit()
+
+        # Show success message
+        flash('Payment successful! Your order is confirmed.', 'success')
+        return redirect(url_for('confirmation', order_id=order.id))
+
+    except stripe.error.StripeError as e:
+        flash('Error verifying payment. Please contact support.', 'error')
+        print(f"Stripe error in success route: {e}")
+        return redirect(url_for('product'))
+
+    except Exception as e:
+        flash('An error occurred. Please contact support.', 'error')
+        print(f"Error in success route: {e}")
+        return redirect(url_for('product'))
+
+
+@app.route('/cancel')
+def cancel():
+    """
+    Payment cancellation route
+
+    Called when user cancels payment on Stripe checkout page.
+    Marks order as cancelled and provides option to retry.
+    """
+    order_id = request.args.get('order_id')
+
+    if order_id:
+        try:
+            order = Order.query.get(order_id)
+            if order and order.status == 'pending':
+                # Mark order as cancelled
+                order.status = 'cancelled'
+                db.session.commit()
+        except Exception as e:
+            print(f"Error updating cancelled order: {e}")
+
+    flash('Payment was cancelled. Your order has been saved if you\'d like to try again.', 'info')
+    return render_template('cancel.html', order_id=order_id)
+
+
+@app.route('/webhook', methods=['POST'])
+def stripe_webhook():
+    """
+    Stripe webhook endpoint
+
+    Listens for Stripe events (checkout.session.completed, payment_intent.succeeded, etc.)
+    Updates order status based on payment events.
+
+    Note: Webhook signature verification is optional if STRIPE_WEBHOOK_SECRET is not set.
+    This allows for easier development/testing without webhook setup.
+    """
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = app.config.get('STRIPE_WEBHOOK_SECRET')
+
+    try:
+        # If webhook secret is configured, verify the signature
+        if webhook_secret:
+            try:
+                event = stripe.Webhook.construct_event(
+                    payload, sig_header, webhook_secret
+                )
+            except stripe.error.SignatureVerificationError as e:
+                print(f"Webhook signature verification failed: {e}")
+                return jsonify({'error': 'Invalid signature'}), 400
+        else:
+            # No webhook secret configured - parse event without verification
+            # ONLY for development/testing
+            event = stripe.Event.construct_from(
+                request.get_json(), stripe.api_key
+            )
+            print("WARNING: Processing webhook without signature verification (development mode)")
+
+        # Handle the event
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+
+            # Get order ID from metadata
+            order_id = session.get('metadata', {}).get('order_id')
+
+            if order_id:
+                try:
+                    order = Order.query.get(order_id)
+
+                    if order:
+                        # Update order status to paid
+                        order.status = 'paid'
+                        order.stripe_payment_id = session.get('payment_intent')
+                        db.session.commit()
+
+                        print(f"Order {order_id} marked as paid via webhook")
+                    else:
+                        print(f"Order {order_id} not found in database")
+
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"Error updating order from webhook: {e}")
+
+        elif event['type'] == 'payment_intent.succeeded':
+            payment_intent = event['data']['object']
+            print(f"Payment intent succeeded: {payment_intent['id']}")
+
+        elif event['type'] == 'payment_intent.payment_failed':
+            payment_intent = event['data']['object']
+            print(f"Payment intent failed: {payment_intent['id']}")
+
+        else:
+            print(f"Unhandled webhook event type: {event['type']}")
+
+        return jsonify({'status': 'success'}), 200
+
+    except Exception as e:
+        print(f"Webhook error: {e}")
+        return jsonify({'error': str(e)}), 400
 
 
 @app.route('/confirmation/<int:order_id>')

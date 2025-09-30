@@ -30,12 +30,34 @@
                 </div>
             </div>
 
-            {# Payment Notice #}
+            {# Payment Status Notice #}
+            {% if order.status == 'paid' %}
+            <div class="bg-green-50 border-l-4 border-green-400 rounded-lg p-6 mb-8">
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-green-900 mb-2">Payment Successful</h3>
+                        <p class="text-green-800 mb-2">
+                            Your payment has been processed successfully!
+                        </p>
+                        <p class="text-green-800">
+                            We'll send you an email at <strong>{{ order.customer_email }}</strong> with your order details.
+                            Your order will be handcrafted and shipped within 2-3 business days.
+                        </p>
+                        {% if order.stripe_payment_id %}
+                        <p class="text-sm text-green-700 mt-2">
+                            Payment ID: <code class="bg-green-100 px-2 py-1 rounded">{{ order.stripe_payment_id }}</code>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% elif order.status == 'pending' %}
             <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-6 mb-8">
                 <div class="flex items-start">
-                    <i class="fas fa-info-circle text-yellow-600 text-2xl mr-4 mt-1"></i>
+                    <i class="fas fa-clock text-yellow-600 text-2xl mr-4 mt-1"></i>
                     <div>
-                        <h3 class="font-bold text-yellow-900 mb-2">Payment Integration Coming Soon</h3>
+                        <h3 class="font-bold text-yellow-900 mb-2">Payment Pending</h3>
                         <p class="text-yellow-800 mb-2">
                             Your order has been received and saved with <strong>pending</strong> status.
                         </p>
@@ -46,6 +68,19 @@
                     </div>
                 </div>
             </div>
+            {% elif order.status == 'cancelled' %}
+            <div class="bg-red-50 border-l-4 border-red-400 rounded-lg p-6 mb-8">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-600 text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-red-900 mb-2">Payment Cancelled</h3>
+                        <p class="text-red-800">
+                            This order was cancelled. If you'd like to complete your purchase, please start a new order.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             {# Order Details #}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

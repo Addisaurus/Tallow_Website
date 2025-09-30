@@ -1,0 +1,148 @@
+{#
+    PAYMENT CANCELLED PAGE TEMPLATE
+    Displays when user cancels payment on Stripe checkout
+#}
+
+{% extends "base.html" %}
+
+{% block title %}Payment Cancelled - {{ site_name }}{% endblock %}
+
+{% block content %}
+
+{# PAYMENT CANCELLED SECTION #}
+<section class="py-16 md:py-24 bg-accent min-h-screen">
+    <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto">
+            {# Cancellation message #}
+            <div class="bg-white rounded-lg shadow-md p-8 md:p-12 text-center mb-8">
+                <div class="mb-6">
+                    <i class="fas fa-times-circle text-yellow-500 text-6xl mb-4"></i>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-dark mb-4" style="font-family: 'Playfair Display', serif;">
+                    Payment Cancelled
+                </h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    Your payment was cancelled and no charges were made to your card.
+                </p>
+                {% if order_id %}
+                <div class="bg-accent p-4 rounded-lg inline-block mb-6">
+                    <p class="text-sm text-gray-600 mb-1">Order Number</p>
+                    <p class="text-xl font-bold text-primary">#{{ order_id }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {# Information box #}
+            <div class="bg-blue-50 border-l-4 border-blue-400 rounded-lg p-6 mb-8">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-blue-900 mb-2">What Happened?</h3>
+                        <p class="text-blue-800 mb-2">
+                            You left the Stripe checkout page before completing your payment.
+                        </p>
+                        {% if order_id %}
+                        <p class="text-blue-800">
+                            Your order (#{{ order_id }}) has been saved with <strong>cancelled</strong> status.
+                            No payment was processed.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# What's Next #}
+            <div class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-8">
+                <h2 class="text-xl font-bold text-dark mb-6 pb-3 border-b" style="font-family: 'Playfair Display', serif;">
+                    What Would You Like to Do?
+                </h2>
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            1
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Try Payment Again</h4>
+                            <p class="text-gray-700 mb-3">
+                                Return to the product page and go through checkout again.
+                                Your cart has been saved.
+                            </p>
+                            <a href="{{ url_for('product') }}" class="btn-primary inline-block">
+                                <i class="fas fa-shopping-bag mr-2"></i>
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            2
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Need Help?</h4>
+                            <p class="text-gray-700 mb-3">
+                                If you experienced any issues during checkout or have questions about payment,
+                                please don't hesitate to contact us.
+                            </p>
+                            <a href="{{ url_for('contact') }}" class="btn-secondary inline-block">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Contact Support
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4 flex-shrink-0">
+                            3
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg mb-2">Browse Our Products</h4>
+                            <p class="text-gray-700 mb-3">
+                                Take your time to learn more about our handcrafted beef tallow moisturizers
+                                and their benefits.
+                            </p>
+                            <a href="{{ url_for('about') }}" class="text-primary hover:text-secondary font-semibold">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Learn More About Our Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Trust reassurance #}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-dark mb-4 text-center" style="font-family: 'Playfair Display', serif;">
+                    Your Security is Our Priority
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div>
+                        <i class="fas fa-shield-alt text-primary text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-700 font-semibold">Powered by Stripe</p>
+                        <p class="text-xs text-gray-600">Industry-leading security</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-lock text-primary text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-700 font-semibold">256-bit SSL</p>
+                        <p class="text-xs text-gray-600">Bank-level encryption</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-credit-card text-primary text-3xl mb-2"></i>
+                        <p class="text-sm text-gray-700 font-semibold">PCI Compliant</p>
+                        <p class="text-xs text-gray-600">Your data is safe</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Quick navigation #}
+            <div class="text-center mt-8">
+                <p class="text-gray-600 mb-4">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <a href="{{ url_for('index') }}" class="text-primary hover:text-secondary font-semibold">Return to Homepage</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
