@@ -156,34 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     // QUANTITY SELECTOR (Product Page)
     // ============================================
-
-    const quantityInput = document.querySelector('input[type="number"]');
-
-    if (quantityInput) {
-        const minusButton = quantityInput.previousElementSibling;
-        const plusButton = quantityInput.nextElementSibling;
-
-        if (minusButton) {
-            minusButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                let currentValue = parseInt(quantityInput.value) || 1;
-                if (currentValue > 1) {
-                    quantityInput.value = currentValue - 1;
-                }
-            });
-        }
-
-        if (plusButton) {
-            plusButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                let currentValue = parseInt(quantityInput.value) || 1;
-                const maxValue = parseInt(quantityInput.getAttribute('max')) || 99;
-                if (currentValue < maxValue) {
-                    quantityInput.value = currentValue + 1;
-                }
-            });
-        }
-    }
+    // Note: Quantity selector functionality is handled in individual page templates
+    // (e.g., product.html) to avoid duplicate event listeners
 
 
     // ============================================

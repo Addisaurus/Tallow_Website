@@ -699,6 +699,31 @@ def confirmation(order_id):
     return render_template('confirmation.html', order=order)
 
 
+@app.route('/health')
+def health_check():
+    """
+    Health check endpoint for Docker and load balancers
+
+    Returns JSON with status information about the application and database
+    Used by Docker healthchecks and monitoring systems
+    """
+    try:
+        # Test database connection
+        db.session.execute(db.text('SELECT 1'))
+        db_status = 'healthy'
+    except Exception as e:
+        db_status = f'unhealthy: {str(e)}'
+
+    health_info = {
+        'status': 'healthy' if db_status == 'healthy' else 'degraded',
+        'database': db_status,
+        'application': 'running'
+    }
+
+    status_code = 200 if health_info['status'] == 'healthy' else 503
+    return jsonify(health_info), status_code
+
+
 # ERROR HANDLERS: These handle common HTTP errors gracefully
 
 @app.errorhandler(404)

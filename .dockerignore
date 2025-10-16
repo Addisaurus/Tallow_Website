@@ -1,0 +1,70 @@
+# Docker ignore file - prevents unnecessary files from being copied into Docker image
+# This makes the Docker image smaller and builds faster
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (should be set via docker-compose or deployment platform)
+.env
+.flaskenv
+
+# Database files (will be in volumes)
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Documentation and guides
+README.md
+SETUP_ECOMMERCE.md
+STRIPE_SETUP.md
+TESTING_INSTRUCTIONS.md
+DATABASE_QUICK_REFERENCE.md
+POSTGRESQL_MIGRATION_GUIDE.md
+POSTGRESQL_SETUP.txt
+CLAUDE.md
+*.md
+!DEPLOYMENT.md
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Logs
+*.log
+
+# Migrations (optional - include if you want to run migrations in container)
+# migrations/
+
+# OS specific
+Thumbs.db

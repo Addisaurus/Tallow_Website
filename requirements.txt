@@ -21,3 +21,10 @@ Flask-Migrate==4.0.5
 
 # Payment processing
 stripe==8.0.0              # Stripe payment processing
+
+# PostgreSQL adapter for SQLAlchemy
+psycopg2-binary==2.9.9     # PostgreSQL database driver
+
+# Production WSGI server
+gunicorn==21.2.0           # Production-grade WSGI HTTP server
+gevent==24.2.1             # Async worker class for better performance
