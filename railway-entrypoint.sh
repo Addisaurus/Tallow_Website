@@ -7,10 +7,14 @@ set -e  # Exit on error
 echo "==================================="
 echo "Tallow & Co. - Railway Deployment"
 echo "==================================="
+echo "Timestamp: $(date)"
+echo "User: $(whoami)"
+echo "Working Directory: $(pwd)"
 
 # Check if DATABASE_URL is set
 if [ -z "$DATABASE_URL" ]; then
     echo "ERROR: DATABASE_URL environment variable is not set"
+    echo "Please add a PostgreSQL database in Railway and ensure DATABASE_URL is set"
     exit 1
 fi
 
@@ -34,6 +38,7 @@ echo "  Database: $DB_NAME"
 # Wait for PostgreSQL to be ready
 echo ""
 echo "Waiting for PostgreSQL to be ready..."
+echo "Attempting connection to: $DB_HOST:$DB_PORT"
 timeout=60
 counter=0
 
@@ -42,16 +47,23 @@ until PGPASSWORD="$DB_PASSWORD" pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_U
     if [ $counter -gt $timeout ]; then
         echo "ERROR: PostgreSQL did not become ready in time ($timeout seconds)"
         echo "This usually means:"
-        echo "  1. Database service is not running"
+        echo "  1. Database service is not running in Railway"
         echo "  2. DATABASE_URL is incorrect"
         echo "  3. Network connectivity issue"
+        echo ""
+        echo "Troubleshooting steps:"
+        echo "  - Check that PostgreSQL service is deployed in Railway"
+        echo "  - Verify DATABASE_URL environment variable is set correctly"
+        echo "  - Check Railway dashboard for database service status"
         exit 1
     fi
-    echo "PostgreSQL is unavailable - waiting... ($counter/$timeout)"
+    if [ $((counter % 5)) -eq 0 ]; then
+        echo "PostgreSQL is unavailable - still waiting... ($counter/$timeout seconds)"
+    fi
     sleep 1
 done
 
-echo "✓ PostgreSQL is ready!"
+echo "✓ PostgreSQL is ready and accepting connections!"
 
 # Run database migrations
 echo ""
@@ -67,19 +79,21 @@ if [ ! -d "migrations" ]; then
             echo "✓ Initial migration created"
         else
             echo "WARNING: Failed to create initial migration"
+            echo "Continuing anyway..."
         fi
     else
         echo "WARNING: Failed to initialize Flask-Migrate"
+        echo "Continuing anyway..."
     fi
 fi
 
-# Run migrations
-if flask db upgrade; then
-    echo "✓ Database migrations completed successfully"
-else
-    echo "WARNING: Database migrations failed"
-    echo "This might be okay if it's a fresh database with no migrations"
-fi
+# Run migrations with timeout to prevent hanging
+echo "Applying database migrations..."
+timeout 30 flask db upgrade || {
+    echo "WARNING: Database migration failed or timed out"
+    echo "If this is first deployment, this may be expected"
+    echo "The application will start anyway, but database may not be initialized"
+}
 
 # Display environment info
 echo ""
