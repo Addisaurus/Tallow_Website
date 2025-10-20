@@ -56,22 +56,22 @@ COPY --from=builder --chown=flaskuser:flaskuser /root/.local /home/flaskuser/.lo
 # Copy application code
 COPY --chown=flaskuser:flaskuser . .
 
-# Copy and set permissions for entrypoint script
+# Copy and set permissions for entrypoint scripts
 COPY --chown=flaskuser:flaskuser entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+COPY --chown=flaskuser:flaskuser railway-entrypoint.sh /app/railway-entrypoint.sh
+RUN chmod +x /app/entrypoint.sh /app/railway-entrypoint.sh
 
 # Switch to non-root user
 USER flaskuser
 
-# Expose port
+# Expose port (Railway will use $PORT env var)
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Set entrypoint
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-# Default command (can be overridden)
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--worker-class", "gevent", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "app:app"]
+# For Railway: use railway-entrypoint.sh
+# For Docker Compose: use entrypoint.sh
+# Railway can override via startCommand in railway.toml
+ENTRYPOINT ["/app/railway-entrypoint.sh"]
