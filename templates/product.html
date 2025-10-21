@@ -74,9 +74,8 @@
                 {# Quantity selector and Add to Cart button #}
                 <form action="{{ url_for('add_to_cart') }}" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="product_id" value="tallow-moisturizer-4oz">
                     <input type="hidden" name="product_name" value="{{ product.name }}">
-                    <input type="hidden" name="product_price" value="{{ product.price }}">
-                    <input type="hidden" name="product_size" value="{{ product.size }}">
 
                     <div class="mb-8">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Quantity</label>

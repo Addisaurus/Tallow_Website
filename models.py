@@ -14,6 +14,7 @@ These models will be used to:
 
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+import secrets
 
 # Initialize SQLAlchemy
 # This will be imported and initialized in app.py
@@ -60,6 +61,10 @@ class Order(db.Model):
 
     # Stripe payment ID (for future integration)
     stripe_payment_id = db.Column(db.String(100), nullable=True)
+
+    # Confirmation token for secure order viewing (prevents IDOR vulnerability)
+    # This allows customers to view their order via unguessable URL instead of sequential ID
+    confirmation_token = db.Column(db.String(64), unique=True, nullable=True)
 
     # Timestamp
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

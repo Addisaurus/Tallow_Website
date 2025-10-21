@@ -60,6 +60,7 @@ echo "Starting Gunicorn (migrations running in background)..."
 echo "==================================="
 
 # Start Gunicorn immediately - don't wait for migrations
+# Note: --preload is NOT used to avoid race condition with background migrations
 exec gunicorn \
     --bind 0.0.0.0:$PORT \
     --workers 4 \
@@ -68,5 +69,4 @@ exec gunicorn \
     --access-logfile - \
     --error-logfile - \
     --log-level info \
-    --preload \
     app:app

@@ -183,3 +183,4 @@ cython_debug/
 # Production credentials and sensitive files
 PRODUCTION_CREDENTIALS.txt
 Claude Code overview.txt
+/.claude

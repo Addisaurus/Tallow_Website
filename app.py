@@ -16,6 +16,7 @@ from forms import CheckoutForm
 from flask_migrate import Migrate
 import os
 import stripe
+import secrets
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -63,6 +64,21 @@ def create_app(config_name='development'):
 
 # Create the app instance using development configuration
 app = create_app(os.getenv('FLASK_ENV', 'development'))
+
+
+# PRODUCT PRICING: Server-side price lookup to prevent manipulation
+# Client should send product_id, not product_price
+PRODUCT_PRICES = {
+    'tallow-moisturizer-2oz': 19.99,
+    'tallow-moisturizer-4oz': 24.99,
+    'tallow-moisturizer-8oz': 39.99
+}
+
+PRODUCT_SIZES = {
+    'tallow-moisturizer-2oz': '2 oz',
+    'tallow-moisturizer-4oz': '4 oz',
+    'tallow-moisturizer-8oz': '8 oz'
+}
 
 
 # HELPER FUNCTIONS: Reusable functions for cart and order management
@@ -234,20 +250,28 @@ def add_to_cart():
     If product already exists in cart, increases quantity.
 
     Expected POST data:
+    - product_id: str (e.g., 'tallow-moisturizer-4oz')
     - product_name: str
-    - product_price: float
-    - product_size: str
     - quantity: int
+
+    SECURITY: Price is looked up server-side to prevent manipulation
     """
     try:
         # Get cart from session (or create empty cart)
         cart = get_cart()
 
         # Get product data from form
+        product_id = request.form.get('product_id')
         product_name = request.form.get('product_name')
-        product_price = float(request.form.get('product_price'))
-        product_size = request.form.get('product_size')
         quantity = int(request.form.get('quantity', 1))
+
+        # SERVER-SIDE PRICE LOOKUP - Never trust client prices!
+        if product_id not in PRODUCT_PRICES:
+            flash('Invalid product selected', 'error')
+            return redirect(url_for('product'))
+
+        product_price = PRODUCT_PRICES[product_id]
+        product_size = PRODUCT_SIZES.get(product_id, '')
 
         # Validate quantity
         if quantity < 1 or quantity > 10:
@@ -257,7 +281,7 @@ def add_to_cart():
         # Check if product already in cart
         product_found = False
         for item in cart:
-            if item['name'] == product_name:
+            if item['name'] == product_name and item['size'] == product_size:
                 # Update quantity (max 10 per product)
                 item['quantity'] = min(item['quantity'] + quantity, 10)
                 product_found = True
@@ -424,7 +448,8 @@ def checkout():
                 tax=totals['tax'],
                 shipping_cost=totals['shipping'],
                 total=totals['total'],
-                status='pending'
+                status='pending',
+                confirmation_token=secrets.token_urlsafe(32)  # Generate secure token for IDOR protection
             )
 
             # Add order items
@@ -570,7 +595,7 @@ def success():
 
         # Show success message
         flash('Payment successful! Your order is confirmed.', 'success')
-        return redirect(url_for('confirmation', order_id=order.id))
+        return redirect(url_for('confirmation', token=order.confirmation_token))
 
     except stripe.error.StripeError as e:
         flash('Error verifying payment. Please contact support.', 'error')
@@ -615,30 +640,30 @@ def stripe_webhook():
     Listens for Stripe events (checkout.session.completed, payment_intent.succeeded, etc.)
     Updates order status based on payment events.
 
-    Note: Webhook signature verification is optional if STRIPE_WEBHOOK_SECRET is not set.
-    This allows for easier development/testing without webhook setup.
+    SECURITY: Always verifies webhook signatures to prevent forged payment events.
+    Fails if STRIPE_WEBHOOK_SECRET is not configured.
     """
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
     webhook_secret = app.config.get('STRIPE_WEBHOOK_SECRET')
 
+    # SECURITY: Require webhook secret to be configured
+    if not webhook_secret:
+        app.logger.error('STRIPE_WEBHOOK_SECRET not configured! Rejecting webhook.')
+        return jsonify({'error': 'Webhook secret not configured'}), 500
+
     try:
-        # If webhook secret is configured, verify the signature
-        if webhook_secret:
-            try:
-                event = stripe.Webhook.construct_event(
-                    payload, sig_header, webhook_secret
-                )
-            except stripe.error.SignatureVerificationError as e:
-                print(f"Webhook signature verification failed: {e}")
-                return jsonify({'error': 'Invalid signature'}), 400
-        else:
-            # No webhook secret configured - parse event without verification
-            # ONLY for development/testing
-            event = stripe.Event.construct_from(
-                request.get_json(), stripe.api_key
+        # Verify webhook signature (prevents forged payment events)
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, webhook_secret
             )
-            print("WARNING: Processing webhook without signature verification (development mode)")
+        except stripe.error.SignatureVerificationError as e:
+            app.logger.error(f"Webhook signature verification failed: {e}")
+            return jsonify({'error': 'Invalid signature'}), 400
+        except ValueError as e:
+            app.logger.error(f"Invalid webhook payload: {e}")
+            return jsonify({'error': 'Invalid payload'}), 400
 
         # Handle the event
         if event['type'] == 'checkout.session.completed':
@@ -683,18 +708,21 @@ def stripe_webhook():
         return jsonify({'error': str(e)}), 400
 
 
-@app.route('/confirmation/<int:order_id>')
-def confirmation(order_id):
+@app.route('/confirmation/<token>')
+def confirmation(token):
     """
     Order confirmation page
 
     Displays order details after successful checkout
 
     Args:
-        order_id: ID of the order to display
+        token: Secure confirmation token (prevents IDOR attacks)
+
+    SECURITY: Uses unguessable token instead of sequential ID to prevent
+    unauthorized access to order details
     """
-    # Get order from database
-    order = Order.query.get_or_404(order_id)
+    # Get order from database using secure token
+    order = Order.query.filter_by(confirmation_token=token).first_or_404()
 
     return render_template('confirmation.html', order=order)
 
